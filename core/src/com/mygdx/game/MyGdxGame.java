@@ -18,8 +18,8 @@ public class MyGdxGame extends ApplicationAdapter {
 	public void create () {
 		batch = new SpriteBatch();
 		img = new Texture("badlogic.jpg");
-		png = new Texture("man.jpg");
-		anim = new MyAnim("man.jpg", 4, 10, 10, Animation.PlayMode.LOOP);
+		png = new Texture("fire.jpg");
+		anim = new MyAnim("fire.jpg", 2, 6, 10, Animation.PlayMode.LOOP);
 	}
 
 	@Override
