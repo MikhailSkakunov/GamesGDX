@@ -20,28 +20,20 @@
   </data>
  </layer>
  <objectgroup id="4" name="env">
-  <object id="1" x="47.8169" y="-85.6247"/>
   <object id="2" x="109.71" y="-74.0956" width="38.8348" height="21.8446"/>
   <object id="3" x="183.132" y="-92.9062" width="18.8106" height="20.0242"/>
-  <object id="5" x="75.7297" y="-54.6782"/>
   <object id="6" x="310.559" y="-93.5133" width="26.0921" height="25.4853"/>
   <object id="7" x="235.316" y="-60.1393" width="32.16" height="12.1358"/>
   <object id="8" x="321.481" y="-37.688" width="28.5193" height="23.0581"/>
   <object id="9" x="-1.33333" y="-70.4548" width="9.70872" height="12.7427"/>
-  <object id="10" x="12.0162" y="-95.3337"/>
-  <object id="11" x="25.3655" y="-24.3386"/>
   <object id="23" x="130.667" y="15.3333" width="282.667" height="6"/>
   <object id="24" x="4" y="48.6667" width="505.333" height="4.66667"/>
  </objectgroup>
  <objectgroup id="5" name="dyn">
-  <object id="25" x="419.333" y="-98.6667"/>
-  <object id="26" x="409.333" y="-50"/>
-  <object id="27" x="301.333" y="-45.3333"/>
-  <object id="28" x="257.333" y="-107.333"/>
   <object id="29" x="187.333" y="-46.6667" width="26.6667" height="17.3333"/>
   <object id="32" x="151.333" y="-123.333" width="20.6667" height="34"/>
  </objectgroup>
- <objectgroup id="6" name="Hero">
-  <object id="19" name="hero" x="85.3333" y="-90"/>
+ <objectgroup id="6" name="hero">
+  <object id="19" name="hero" x="64" y="-90" width="21.3333" height="14.6667"/>
  </objectgroup>
 </map>

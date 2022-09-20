@@ -18,6 +18,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
@@ -102,7 +103,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		}
 
 		env = map.getLayers().get("hero");
-		RectangleMapObject hero = (RectangleMapObject) env.getObjects().get("Hero");
+		RectangleMapObject hero = (RectangleMapObject) env.getObjects().get("hero");
 			float x = hero.getRectangle().x;
 			float y = hero.getRectangle().y;
 			float w = hero.getRectangle().width/2;
@@ -119,7 +120,7 @@ public class MyGdxGame extends ApplicationAdapter {
 
 		shape.dispose();
 
-//		shapeRenderer = new ShapeRenderer();
+		shapeRenderer = new ShapeRenderer();
 		rectangle = new Rectangle();
 		window = new Rectangle(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		myInputProcessor = new MyInputProcessor();
@@ -135,9 +136,9 @@ public class MyGdxGame extends ApplicationAdapter {
 
 		batch = new SpriteBatch();
 		img = new Texture("badlogic.jpg");
-		run = new MyAtlasAnim("atlas/unnamed.atlas", "mario_run", 10, Animation.PlayMode.LOOP);
-		stand = new MyAtlasAnim("atlas/unnamed.atlas", "mario_stand", 10, Animation.PlayMode.LOOP);
-		jump = new MyAtlasAnim("atlas/unnamed.atlas", "mario_jump", 10, Animation.PlayMode.LOOP);
+		run = new MyAtlasAnim("atlas/unnamed.atlas", "mario_run", 10, true, "assets_single_on_dirty_stone_step_flip_flop_007_30443.mp3");
+		stand = new MyAtlasAnim("atlas/unnamed.atlas", "mario_stand", 10, false, "assets_single_on_dirty_stone_step_flip_flop_007_30443.mp3");
+		jump = new MyAtlasAnim("atlas/unnamed.atlas", "mario_jump", 10, true, "assets_single_on_dirty_stone_step_flip_flop_007_30443.mp3");
 
 		camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
@@ -149,7 +150,7 @@ public class MyGdxGame extends ApplicationAdapter {
 
 		camera.position.x = body.getPosition().x;
 		camera.position.y = body.getPosition().y;
-		camera.zoom = 0.5f;
+		camera.zoom = 1;
 		camera.update();
 
 		mapRenderer.setView(camera);
@@ -165,17 +166,22 @@ public class MyGdxGame extends ApplicationAdapter {
 		if(myInputProcessor.getOutString().contains("Left")) {
 			dir = -1;
 			tmpA = run;
+			body.applyForceToCenter(new Vector2(-10000, 0f), true);
+
 		}
 		if(myInputProcessor.getOutString().contains("Right")) {
 			dir = 1;
 			tmpA = run;
+			body.applyForceToCenter(new Vector2(10000, 0f), true);
+
 		}
 		if(myInputProcessor.getOutString().contains("Up")) { y++;
 		tmpA = jump;}
 		if(myInputProcessor.getOutString().contains("Down")) { y--; }
 		if(myInputProcessor.getOutString().contains("Space")) {
-			x = Gdx.graphics.getWidth()/2;
-			y = Gdx.graphics.getHeight()/2;
+//			x = Gdx.graphics.getWidth()/2;
+//			y = Gdx.graphics.getHeight()/2;
+			body.applyForceToCenter(new Vector2(0, 100000f), true);
 		}
 
 		if (dir == -1) x-=step;
@@ -211,7 +217,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		if (!window.contains(rectangle)) Gdx.graphics.setTitle("Out");
 		else Gdx.graphics.setTitle("In");
 
-//		phisX.step();
+		phisX.step();
 		phisX.debugDraw(camera);
 	}
 
