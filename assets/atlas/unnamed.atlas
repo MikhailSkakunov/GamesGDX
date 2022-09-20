@@ -1,0 +1,48 @@
+
+unnamed.png
+size: 512, 128
+format: RGBA8888
+filter: Nearest, Nearest
+repeat: none
+mario_jump
+  rotate: false
+  xy: 159, 12
+  size: 50, 85
+  orig: 50, 85
+  offset: 0, 0
+  index: 1
+mario_run
+  rotate: false
+  xy: 107, 7
+  size: 50, 90
+  orig: 50, 90
+  offset: 0, 0
+  index: 1
+mario_run
+  rotate: false
+  xy: 211, 13
+  size: 48, 84
+  orig: 48, 84
+  offset: 0, 0
+  index: 3
+mario_run
+  rotate: false
+  xy: 261, 11
+  size: 46, 86
+  orig: 46, 86
+  offset: 0, 0
+  index: 2
+mario_stand
+  rotate: false
+  xy: 2, 2
+  size: 50, 95
+  orig: 50, 95
+  offset: 0, 0
+  index: 1
+mario_stand
+  rotate: false
+  xy: 54, 4
+  size: 51, 93
+  orig: 51, 93
+  offset: 0, 0
+  index: 2
