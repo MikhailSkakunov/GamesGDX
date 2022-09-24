@@ -2,28 +2,41 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.math.Vector2;
 
 public class MyInputProcessor implements InputProcessor {
 
-    private String outString = "";
+    private final Vector2 outForce;
 
-    public String getOutString() {
-        return outString;
+    public MyInputProcessor() {
+        outForce = new Vector2();
+    }
+
+    public Vector2 getVector() {
+        return outForce;
     }
 
     @Override
     public boolean keyDown(int keycode) {
-        if (!outString.contains(Input.Keys.toString(keycode))) {
-            outString += Input.Keys.toString(keycode);
+        String outString = Input.Keys.toString(keycode);
+        switch (outString)
+        {
+            case "Left": outForce.add(-0.25f, 0); break;
+            case "Right": outForce.add(0.25f, 0); break;
+            case "Down": outForce.add(0, -1.5f); break;
+            case "Space": outForce.add(0, 1.5f); break;
         }
         return true;
     }
 
     @Override
     public boolean keyUp(int keycode) {
-        if (outString.contains(Input.Keys.toString(keycode))) {
-            String tmp = outString.replace(Input.Keys.toString(keycode), "");
-            outString = tmp;
+        String outString = Input.Keys.toString(keycode);
+        switch (outString) {
+            case "Left": outForce.set(0, outForce.y); break;
+            case "Right": outForce.set(0, outForce.y); break;
+            case "Down": outForce.set(outForce.x, 0); break;
+            case "Space": outForce.set(outForce.x, 0); break;
         }
         return true;
     }

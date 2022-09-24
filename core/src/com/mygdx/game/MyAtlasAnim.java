@@ -10,10 +10,9 @@ public class MyAtlasAnim {
     TextureAtlas atlas;
     Animation<TextureAtlas.AtlasRegion> animation;
     private float time;
+    private final Sound sound;
+
     private boolean loop;
-
-    private Sound sound;
-
     private float d;
 
     public MyAtlasAnim(String atlas, String name, float fps, boolean playMode, String sound) {
@@ -42,6 +41,10 @@ public class MyAtlasAnim {
             d = animation.getAnimationDuration() / 2;
             sound.play();
         }
+    }
+
+    public void putTime(float time) {
+        this.time = time;
     }
 
     public void dispose() {
