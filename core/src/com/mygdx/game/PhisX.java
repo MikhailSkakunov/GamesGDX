@@ -5,15 +5,34 @@ import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.utils.Array;
+
+import java.util.Iterator;
 
 public class PhisX {
-    public final float PPM = 100;
+    public final MyContactListner contactListner;
+    public final static float PPM = 100;
     public final World world;
     private final Box2DDebugRenderer debugRenderer;
 
     public PhisX() {
         world = new World(new Vector2(0, -9.81f), true);
         debugRenderer = new Box2DDebugRenderer();
+
+        contactListner = new MyContactListner();
+        world.setContactListener(contactListner);
+    }
+
+    public void destroyBody(Body body){world.destroyBody(body);}
+    public Array<Body> getBodys(String name) {
+        Array<Body> tmp = new Array<>();
+        world.getBodies(tmp);
+        Iterator<Body> it = tmp.iterator();
+        while (it.hasNext()) {
+            Body body = it.next();
+            if (!body.getUserData().equals("coins")) it.remove();
+        }
+        return tmp;
     }
 
     public Body addObject(RectangleMapObject object) {
@@ -29,7 +48,6 @@ public class PhisX {
         def.position.set((rect.x + rect.width/2)/PPM, (rect.y + rect.height/2)/PPM);
         def.gravityScale = (float) object.getProperties().get("gravityScale");
 
-
         polygonShape.setAsBox(rect.width/2/PPM, rect.height/2/PPM);
 
         fdef.shape = polygonShape;
@@ -41,8 +59,15 @@ public class PhisX {
         if (object.getName() != null) name = object.getName();
         Body body;
         body = world.createBody(def);
-        body.setUserData("body");
+        body.setUserData(name);
         body.createFixture(fdef).setUserData(name);
+
+        if (name.equals("hero")) {
+            polygonShape.setAsBox(rect.width/3/PPM, rect.height/10/PPM, new Vector2(0, -rect.width/2), 0);
+            body.createFixture(fdef).setUserData("legs");
+            body.getFixtureList().get(1).setSensor(true);
+        }
+
         polygonShape.dispose();
         return body;
     }

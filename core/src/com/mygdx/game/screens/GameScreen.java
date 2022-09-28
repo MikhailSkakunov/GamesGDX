@@ -8,27 +8,33 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.mygdx.game.MyAtlasAnim;
+import com.mygdx.game.MyAnim;
+import com.mygdx.game.MyContactListner;
 import com.mygdx.game.MyInputProcessor;
 import com.mygdx.game.PhisX;
-import com.mygdx.game.enums.Actions;
+import com.mygdx.game.persons.Man;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GameScreen implements Screen {
 
     Game game;
     private SpriteBatch batch;
     private Texture img;
-    private HashMap<Actions, MyAtlasAnim> manAssetss;
     private Music music;
     private Sound sound;
     private MyInputProcessor myInputProcessor;
@@ -37,13 +43,20 @@ public class GameScreen implements Screen {
     private Body body;
     private TiledMap map;
     private OrthogonalTiledMapRenderer mapRenderer;
-    private Actions actions;
     private  int[] front, tL;
+    private final Man man;
+    private final MyAnim coinAnm;
+    public static List<Body> bodyToDelete;
+
 
     public GameScreen(Game game) {
+        bodyToDelete = new ArrayList<>();
         this.game = game;
+        coinAnm = new MyAnim("Full Coinss.png",1,8, 12, Animation.PlayMode.LOOP);
+
         map = new TmxMapLoader().load("map/безымянный.tmx");
         mapRenderer = new OrthogonalTiledMapRenderer(map);
+
 
         front = new int[1];
         front[0] = map.getLayers().getIndex("front");
@@ -60,6 +73,7 @@ public class GameScreen implements Screen {
 
         body = phisX.addObject((RectangleMapObject) map.getLayers().get("hero").getObjects().get("hero"));
         body.setFixedRotation(true);
+        man = new Man(body);
 
         myInputProcessor = new MyInputProcessor();
         Gdx.input.setInputProcessor(myInputProcessor);
@@ -75,13 +89,14 @@ public class GameScreen implements Screen {
         batch = new SpriteBatch();
         img = new Texture("badlogic.jpg");
 
-        manAssetss = new HashMap<>();
-        manAssetss.put(Actions.STAND, new MyAtlasAnim("atlas/unnamed.atlas", "mario_stand", 7, false, "assets_single_on_dirty_stone_step_flip_flop_007_30443.mp3"));
-        manAssetss.put(Actions.RUN, new MyAtlasAnim("atlas/unnamed.atlas", "mario_run", 7, true, "assets_single_on_dirty_stone_step_flip_flop_007_30443.mp3"));
-        manAssetss.put(Actions.JUMP, new MyAtlasAnim("atlas/unnamed.atlas", "mario_jump", 7, true, "assets_single_on_dirty_stone_step_flip_flop_007_30443.mp3"));
-        actions = Actions.STAND;
+//        manAssetss = new HashMap<>();
+//        manAssetss.put(Actions.STAND, new MyAtlasAnim("atlas/unnamed.atlas", "mario_stand", 7, false, "assets_single_on_dirty_stone_step_flip_flop_007_30443.mp3"));
+//        manAssetss.put(Actions.RUN, new MyAtlasAnim("atlas/unnamed.atlas", "mario_run", 7, true, "assets_single_on_dirty_stone_step_flip_flop_007_30443.mp3"));
+//        manAssetss.put(Actions.JUMP, new MyAtlasAnim("atlas/unnamed.atlas", "mario_jump", 7, true, "assets_single_on_dirty_stone_step_flip_flop_007_30443.mp3"));
+//        actions = Actions.STAND;
 
         camera = new OrthographicCamera();
+        camera.zoom = 0.35f;
     }
 
     @Override
@@ -95,39 +110,48 @@ public class GameScreen implements Screen {
 
         camera.position.x = body.getPosition().x * phisX.PPM;
         camera.position.y = body.getPosition().y * phisX.PPM;
-        camera.zoom = 1;
+//        camera.zoom = 1;
         camera.update();
 
         mapRenderer.setView(camera);
         mapRenderer.render(tL);
 
-        manAssetss.get(actions).setTime(Gdx.graphics.getDeltaTime());
-        body.applyForceToCenter(myInputProcessor.getVector(), true);
+        man.setTime(delta);
+        Vector2 vector = myInputProcessor.getVector();
+        if (MyContactListner.cnt < 1) vector.set(vector.x, 0);
+        body.applyForceToCenter(vector, true);
+        man.setFPS(body.getLinearVelocity(), true);
 
-        if (body.getLinearVelocity().len() < 0.6f) actions = Actions.STAND;
-        else if (Math.abs(body.getLinearVelocity().x) > 0.6f)  {
-            actions = Actions.RUN;
-        }
-
-        manAssetss.get(actions).setTime(Gdx.graphics.getDeltaTime());
-        if (!manAssetss.get(actions).draw().isFlipX() & body.getLinearVelocity().x < 0.6f) {
-            manAssetss.get(actions).draw().flip(true, false);
-        }
-        if (manAssetss.get(actions).draw().isFlipX() & body.getLinearVelocity().x > 0.6f) {
-            manAssetss.get(actions).draw().flip(true, false);
-        }
-
-        float x = body.getPosition().x * phisX.PPM - 2.5f/camera.zoom;
-        float y = body.getPosition().y * phisX.PPM - 2.5f/camera.zoom;
+        Rectangle tmp = man.getRect(camera, man.getFrame());
+        ((PolygonShape)body.getFixtureList().get(0).getShape()).setAsBox(tmp.width/2, tmp.height/2);
+        ((PolygonShape)body.getFixtureList().get(1).getShape()).setAsBox(
+                tmp.width/3,
+                tmp.height/10,
+                new Vector2(0, -tmp.height/2),0);
 
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
-        batch.draw(manAssetss.get(actions).draw(), x, y);
+        batch.draw(man.getFrame(), tmp.x,tmp.y, tmp.width * PhisX.PPM, tmp.height * PhisX.PPM);
+
+        Array<Body> bodys = phisX.getBodys("coins");
+        coinAnm.setTime(delta);
+        TextureRegion tr = coinAnm.draw();
+        float dScale = 6;
+        for (Body bd: bodys) {
+            float cx = bd.getPosition().x * PhisX.PPM - tr.getRegionWidth() / 2 / dScale;
+            float cy = bd.getPosition().y * PhisX.PPM - tr.getRegionHeight() / 2 / dScale;
+            float cW = tr.getRegionWidth() / PhisX.PPM / dScale;
+            float cH = tr.getRegionHeight() / PhisX.PPM / dScale;
+            ((PolygonShape)bd.getFixtureList().get(0).getShape()).setAsBox(cW/2, cH/2);
+            batch.draw(tr, cx,cy, cW * PhisX.PPM, cH * PhisX.PPM);
+        }
         batch.end();
 
         mapRenderer.render(front);
 
-        Gdx.graphics.setTitle(String.valueOf(body.getLinearVelocity()));
+        for (Body bd: bodyToDelete) {phisX.destroyBody(bd);}
+        bodyToDelete.clear();
+
         phisX.step();
         phisX.debugDraw(camera);
     }

@@ -21,10 +21,10 @@ public class MyInputProcessor implements InputProcessor {
         String outString = Input.Keys.toString(keycode);
         switch (outString)
         {
-            case "Left": outForce.add(-0.25f, 0); break;
-            case "Right": outForce.add(0.25f, 0); break;
-            case "Down": outForce.add(0, -1.5f); break;
-            case "Space": outForce.add(0, 1.5f); break;
+            case "Left": outForce.add(-0.0075f, 0); break;
+            case "Right": outForce.add(0.0075f, 0); break;
+            case "Down": outForce.add(0, -0.75f); break;
+            case "Space": outForce.add(0, 0.75f); break;
         }
         return true;
     }
