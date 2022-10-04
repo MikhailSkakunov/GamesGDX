@@ -16,19 +16,21 @@ public class Man {
     HashMap<Actions, Animation<TextureRegion>> manAssetss;
     private final float FPS = 1/7f;
     private float time;
-    public static boolean canJump;
+    public static boolean canJump, isFire;
     private Animation<TextureRegion> baseAnm;
     private boolean loop;
     private TextureAtlas atl;
     private Body body;
     private Dir dir;
     private static float dScale = 2.8f;
+    private float hitPoints, live;
     public enum Dir{LEFT, RIGHT}
 
     public Man(Body body){
+        hitPoints = live = 100;
         this.body = body;
         manAssetss = new HashMap<>();
-        atl = new TextureAtlas("atlas/unnamed.atlas");
+        atl = new TextureAtlas("atlas/man.atlas");
         manAssetss.put(Actions.JUMP, new Animation<TextureRegion>(FPS, atl.findRegions("mario_jump")));
         manAssetss.put(Actions.RUN, new Animation<TextureRegion>(FPS, atl.findRegions("mario_run")));
         manAssetss.put(Actions.STAND, new Animation<TextureRegion>(FPS, atl.findRegions("mario_stand")));
@@ -37,24 +39,35 @@ public class Man {
         loop = true;
         dir = Dir.LEFT;
     }
-
+    public float getHit(float damage) {
+        hitPoints -= damage;
+        return hitPoints;
+    }
+    public int getDir(){return (dir == Dir.LEFT)?-1:1;}
     public boolean isCanJump() {return canJump;}
     public static void setCanJump(boolean isJump) {canJump = isJump;}
     public void setDir(Dir dir){this.dir = dir;}
     public void setLoop(boolean loop) {this.loop = loop;}
-    public void setFPS(Vector2 vector, boolean onGround) {
+    public Body setFPS(Vector2 vector, boolean onGround) {
         if (vector.x > 0.1f) setDir(Dir.RIGHT);
         if (vector.x < -0.1f) setDir(Dir.LEFT);
         float tmp = (float) (Math.sqrt(vector.x*vector.x + vector.y*vector.y))*10;
         setState(Actions.STAND);
+        if (isFire) {
+            setState(Actions.SHOOT);
+            return body;
+        }
         if (Math.abs(vector.x) > 0.25f && Math.abs(vector.y) < 10 && onGround) {
             setState(Actions.RUN);
             baseAnm.setFrameDuration(1/tmp);
+            return null;
         }
         if (Math.abs(vector.y) > 1 && canJump) {
             setState(Actions.JUMP);
             baseAnm.setFrameDuration(FPS);
+            return null;
         }
+        return null;
     }
 
     public float setTime(float deltaTime) {
@@ -66,6 +79,7 @@ public class Man {
         baseAnm = manAssetss.get(state);
         switch (state){
             case STAND: loop = true; baseAnm.setFrameDuration(FPS);break;
+            case SHOOT: loop = true; baseAnm.setFrameDuration(FPS);break;
             case JUMP: loop = false; break;
             default: loop = true;
         }

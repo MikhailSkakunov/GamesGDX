@@ -3,6 +3,7 @@ package com.mygdx.game;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.math.Vector2;
+import com.mygdx.game.persons.Man;
 
 public class MyInputProcessor implements InputProcessor {
 
@@ -23,8 +24,8 @@ public class MyInputProcessor implements InputProcessor {
         {
             case "Left": outForce.add(-0.0075f, 0); break;
             case "Right": outForce.add(0.0075f, 0); break;
-            case "Down": outForce.add(0, -0.75f); break;
-            case "Space": outForce.add(0, 0.75f); break;
+            case "Up":outForce.add(0, 0.15f); break;
+            case "Space": Man.isFire = true; break;
         }
         return true;
     }

@@ -51,7 +51,7 @@ public class PhisX {
         polygonShape.setAsBox(rect.width/2/PPM, rect.height/2/PPM);
 
         fdef.shape = polygonShape;
-        fdef.friction = (float) object.getProperties().get("friction");
+        if ( object.getProperties().get("friction") != null) fdef.friction = (float) object.getProperties().get("friction");
         fdef.density = 1;
         fdef.restitution = (float) object.getProperties().get("restitution");
 
@@ -72,6 +72,45 @@ public class PhisX {
         return body;
     }
 
+    public Body addBullet(float x, float y) {
+        BodyDef def = new BodyDef();
+        FixtureDef fdef = new FixtureDef();
+        PolygonShape polygonShape = new PolygonShape();
+        def.type = BodyDef.BodyType.DynamicBody;
+        def.position.set(x, y);
+        polygonShape.setAsBox(2/PPM, 2/PPM);
+        fdef.shape = polygonShape;
+        Body body;
+        body = world.createBody(def);
+        body.setUserData("bullet");
+        body.createFixture(fdef).setUserData("bullet");
+        body.getFixtureList().get(0).setSensor(true);
+        polygonShape.dispose();
+        return body;
+    }
+
+    public void addDmgObject(RectangleMapObject object) {
+        Rectangle rect = object.getRectangle();
+        String type = (String) object.getProperties().get("BodyType");
+        BodyDef def = new BodyDef();
+        FixtureDef fdef = new FixtureDef();
+        PolygonShape polygonShape = new PolygonShape();
+
+        def.type = BodyDef.BodyType.StaticBody;
+        def.position.set((rect.x + rect.width/2)/PPM, (rect.y + rect.height/2)/PPM);
+        polygonShape.setAsBox(rect.width/2/PPM, rect.height/2/PPM);
+        fdef.shape = polygonShape;
+
+
+        String name = "damage";
+        Body body;
+        body = world.createBody(def);
+        body.setUserData(name);
+        body.createFixture(fdef).setUserData(name);
+        body.getFixtureList().get(0).setSensor(true);
+        polygonShape.dispose();
+    }
+
     public void debugDraw(OrthographicCamera camera) {
         debugRenderer.render(world, camera.combined);
     }
@@ -83,6 +122,7 @@ public class PhisX {
     public void dispose() {
         world.dispose();
         debugRenderer.dispose();
+        MyContactListner.isDamage = false;
     }
 
 }
